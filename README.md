@@ -120,7 +120,7 @@ npm run dist
 
 产物在 `dist/`：
 
-- `MeijiRatPet-Setup-0.3.0.exe`：安装包，约 83 MB
+- `MeijiRatPet-Setup-0.3.1.exe`：安装包，约 83 MB
 - `win-unpacked/`：解压后的程序，可以直接运行调试
 
 几点说明：

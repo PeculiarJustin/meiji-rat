@@ -253,8 +253,15 @@ ipcMain.on("drag:start", (event, x, y) => {
 
 ipcMain.on("drag:move", (event, x, y) => {
   if (!dragState) return;
-  const nextX = dragState.winX + Math.round(x - dragState.startX);
-  const nextY = dragState.winY + Math.round(y - dragState.startY);
+
+  let nextX = dragState.winX + Math.round(x - dragState.startX);
+  let nextY = dragState.winY + Math.round(y - dragState.startY);
+
+  // 不让宠物被拖出屏幕：以鼠标所在的显示器为准，把整个窗口限制在工作区内
+  const area = screen.getDisplayNearestPoint({ x, y }).workArea;
+  nextX = Math.min(Math.max(nextX, area.x), area.x + area.width - WIDTH);
+  nextY = Math.min(Math.max(nextY, area.y), area.y + area.height - HEIGHT);
+
   dragState.win.setPosition(nextX, nextY);
 });
 
