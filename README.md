@@ -41,6 +41,24 @@ npm start
 
 > **本机备注**：这台机器上 Electron 对安装路径比较敏感，直接 `npm start` 会启动失败，请双击 `启动桌宠.cmd`。它会把 `D:\electron-runtime` 里的 Electron 运行时拉起来；换一台电脑则直接用 `npm start`。
 
+## 打包成 exe
+
+```powershell
+npm run dist
+```
+
+产物在 `dist/`：
+
+- `美叽与大鼠-Setup-0.2.0.exe`：安装包，约 83 MB
+- `win-unpacked/`：解压后的程序，可以直接运行调试
+
+几点说明：
+
+- 安装包**没有代码签名**，Windows 可能弹“未知发布者”，点“更多信息 → 仍要运行”即可
+- 安装后从桌面快捷方式启动，不需要 Node，也不需要终端
+- `dist/` 已被 `.gitignore` 忽略，安装包不进 Git；以后可以发到 GitHub Releases
+- 83 MB 是 Electron 的代价：它把 Chromium 和 Node 一起打包了
+
 ## 文件地图
 
 | 文件 | 作用 |
