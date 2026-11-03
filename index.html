@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>美叽与大鼠 · 桌面宠物 v0.1</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 背景层：假装这是一张电脑桌面。
+       以后装进 Electron 时，这一层会被隐藏，窗口就变成透明的了。 -->
+  <div class="wallpaper" aria-hidden="true"></div>
+
+  <header class="titlebar">
+    <span class="dot"></span>
+    美叽与大鼠
+    <span class="ver">v0.1</span>
+  </header>
+
+  <p class="hint">拖动我 · 点一下有惊喜</p>
+
+  <!-- 宠物本体：一个可以拖动、可以点击的容器 -->
+  <div class="pet" id="pet" tabindex="0" role="button"
+       aria-label="美叽与大鼠，点击互动，按住可以拖动">
+    <!-- 说话气泡 -->
+    <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+
+    <div class="pet-inner" id="petInner">
+      <!-- 地上的影子，让角色看起来是“站”着的 -->
+      <div class="ground-shadow" aria-hidden="true"></div>
+
+      <div class="characters">
+        <!-- ============ 大鼠 ============ -->
+        <svg class="rat" viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="大鼠">
+          <!-- 尾巴：先画，藏在身体后面 -->
+          <path class="tail" d="M252 206 C 318 224 330 146 284 128"
+                fill="none" stroke="#b7c6d7" stroke-width="15" stroke-linecap="round" />
+
+          <!-- 耳朵 -->
+          <g class="ear">
+            <circle cx="86" cy="78" r="46" fill="#c9d6e5" />
+            <circle cx="86" cy="80" r="27" fill="#f6c2ce" />
+            <circle cx="220" cy="72" r="42" fill="#c9d6e5" />
+            <circle cx="220" cy="74" r="24" fill="#f6c2ce" />
+          </g>
+
+          <!-- 身体 -->
+          <ellipse class="body" cx="160" cy="176" rx="110" ry="92" fill="#dbe5f0" />
+          <ellipse cx="160" cy="200" rx="74" ry="60" fill="#f0f6fb" />
+
+          <!-- 腮红 -->
+          <ellipse class="blush" cx="100" cy="172" rx="17" ry="9" fill="#f8c3cf" opacity=".55" />
+          <ellipse class="blush" cx="220" cy="172" rx="17" ry="9" fill="#f8c3cf" opacity=".55" />
+
+          <!-- 嘴套 -->
+          <ellipse cx="160" cy="172" rx="38" ry="27" fill="#f8fbff" />
+
+          <!-- 胡须 -->
+          <g stroke="#b9c8d8" stroke-width="2.5" stroke-linecap="round">
+            <path d="M104 166 L60 156" />
+            <path d="M104 173 L58 174" />
+            <path d="M106 180 L62 190" />
+            <path d="M216 166 L260 156" />
+            <path d="M216 173 L262 174" />
+            <path d="M214 180 L258 190" />
+          </g>
+
+          <!-- 鼻子、嘴、门牙 -->
+          <ellipse cx="160" cy="162" rx="9" ry="7" fill="#ef9fb4" />
+          <path d="M160 170 C 160 178 152 182 148 176" fill="none"
+                stroke="#39404b" stroke-width="3" stroke-linecap="round" />
+          <path d="M160 170 C 160 178 168 182 172 176" fill="none"
+                stroke="#39404b" stroke-width="3" stroke-linecap="round" />
+          <rect x="152.5" y="176" width="6.5" height="8" rx="2" fill="#fff" stroke="#dfe9f4" />
+          <rect x="161" y="176" width="6.5" height="8" rx="2" fill="#fff" stroke="#dfe9f4" />
+
+          <!-- 眼睛：加 .blink 时整体压扁，就是眨眼 -->
+          <g class="eye">
+            <ellipse cx="124" cy="146" rx="7.5" ry="9.5" fill="#39404b" />
+            <circle cx="121.5" cy="142.5" r="2.4" fill="#fff" opacity=".9" />
+          </g>
+          <g class="eye">
+            <ellipse cx="196" cy="146" rx="7.5" ry="9.5" fill="#39404b" />
+            <circle cx="193.5" cy="142.5" r="2.4" fill="#fff" opacity=".9" />
+          </g>
+
+          <!-- 前爪 -->
+          <ellipse cx="112" cy="244" rx="24" ry="13" fill="#cbd8e7" />
+          <ellipse cx="208" cy="244" rx="24" ry="13" fill="#cbd8e7" />
+        </svg>
+
+        <!-- ============ 美叽 ============ -->
+        <svg class="bird" viewBox="0 0 150 140" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="美叽">
+          <!-- 脚 -->
+          <ellipse cx="62" cy="132" rx="9" ry="4.5" fill="#f2ab4e" />
+          <ellipse cx="88" cy="132" rx="9" ry="4.5" fill="#f2ab4e" />
+
+          <!-- 呆毛 -->
+          <path d="M70 36 C 60 22 64 8 78 3 C 72 14 75 26 84 33 Z" fill="#ffd98a" />
+
+          <!-- 身体 -->
+          <ellipse cx="75" cy="82" rx="50" ry="46" fill="#fff1c9" />
+          <ellipse cx="75" cy="90" rx="34" ry="29" fill="#fff9e6" />
+
+          <!-- 翅膀 -->
+          <ellipse cx="34" cy="88" rx="13" ry="23" fill="#ffe0a0"
+                   transform="rotate(14 34 88)" />
+
+          <!-- 蝴蝶结 -->
+          <g fill="#ef8fa3">
+            <path d="M108 34 L120 26 L120 42 Z" />
+            <path d="M108 34 L96 26 L96 42 Z" />
+            <circle cx="108" cy="34" r="4.5" fill="#e57e94" />
+          </g>
+
+          <!-- 腮红 -->
+          <ellipse cx="42" cy="92" rx="9" ry="5.5" fill="#ffc4ce" opacity=".75" />
+          <ellipse cx="108" cy="92" rx="9" ry="5.5" fill="#ffc4ce" opacity=".75" />
+
+          <!-- 眼睛 -->
+          <g class="eye">
+            <circle cx="58" cy="78" r="5.5" fill="#39404b" />
+            <circle cx="56.2" cy="76.2" r="1.8" fill="#fff" opacity=".95" />
+          </g>
+          <g class="eye">
+            <circle cx="92" cy="78" r="5.5" fill="#39404b" />
+            <circle cx="90.2" cy="76.2" r="1.8" fill="#fff" opacity=".95" />
+          </g>
+
+          <!-- 嘴 -->
+          <path d="M75 86 L64 94 Q75 101 86 94 Z" fill="#f4a63f" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 一条假的“任务栏”，只是为了营造桌面的感觉 -->
+  <div class="taskbar" aria-hidden="true">
+    <span class="icon">🐭</span>
+    <span class="icon">🌿</span>
+    <span class="icon">🎧</span>
+    <span class="icon">📁</span>
+    <span class="icon">⚙️</span>
+  </div>
+
+  <script src="pet.js"></script>
+</body>
+</html>

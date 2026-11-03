@@ -1,0 +1,347 @@
+/* =========================================================
+   美叽与大鼠 · 桌宠 v0.1
+   CSS 负责：长相（颜色、大小、位置）和动作（呼吸、眨眼、跳）
+   ========================================================= */
+
+:root {
+  --ink: #39404b;
+  --ink-soft: #66768a;
+  --coral: #ef8fa3;
+  --paper: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #edf2f7;
+  color: var(--ink);
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 背景：假装是电脑桌面 ---------- */
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 520px at 12% 18%, #ffe7dd 0%, rgba(255, 231, 221, 0) 62%),
+    radial-gradient(820px 560px at 88% 16%, #dcecf8 0%, rgba(220, 236, 248, 0) 64%),
+    linear-gradient(155deg, #f8f4ec 0%, #eaf2ef 48%, #e4ebf6 100%);
+}
+
+.wallpaper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.55) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+}
+
+/* ---------- 左上角的小标签 ---------- */
+.titlebar {
+  position: fixed;
+  top: 22px;
+  left: 26px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  user-select: none;
+  z-index: 20;
+}
+
+.titlebar .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 3px rgba(239, 143, 163, 0.18);
+}
+
+.titlebar .ver {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+/* ---------- 右上角的提示，8 秒后自动淡出 ---------- */
+.hint {
+  position: fixed;
+  top: 28px;
+  right: 30px;
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(102, 118, 138, 0.9);
+  user-select: none;
+  z-index: 20;
+  animation: hint-fade 9s ease forwards;
+}
+
+@keyframes hint-fade {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- 宠物容器 ---------- */
+.pet {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 360px;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 10;
+}
+
+.pet.is-dragging {
+  cursor: grabbing;
+}
+
+.pet:focus-visible {
+  outline: 2px dashed rgba(239, 143, 163, 0.75);
+  outline-offset: 16px;
+  border-radius: 60px;
+}
+
+.pet-inner {
+  position: relative;
+}
+
+/* 让角色轻轻“呼吸” */
+.characters {
+  position: relative;
+  width: 360px;
+  transform-origin: 50% 92%;
+  animation: breathe 4.2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.012, 1.025) translateY(-3px);
+  }
+}
+
+/* 跳一下：JS 给 .pet-inner 加上 .jump，动画结束再拿掉 */
+.pet-inner.jump {
+  animation: jump 0.65s cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  32% {
+    transform: translateY(-30px) scale(1.02, 1.04);
+  }
+  58% {
+    transform: translateY(0) scale(1.03, 0.97);
+  }
+  76% {
+    transform: translateY(-9px) scale(1, 1.01);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 两个角色 */
+.rat {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 14px 16px rgba(70, 88, 110, 0.12));
+}
+
+.bird {
+  position: absolute;
+  left: 110px;
+  top: -26px;
+  width: 140px;
+  height: auto;
+  filter: drop-shadow(0 10px 12px rgba(70, 88, 110, 0.12));
+  transform-origin: 50% 100%;
+  animation: bob 3.2s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(1.2deg);
+  }
+}
+
+/* 眼睛：眨眼时纵向压扁。transform-box 让缩放以眼睛自己为中心 */
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.09s ease;
+}
+
+.blink .eye {
+  transform: scaleY(0.08);
+}
+
+/* 地上的影子 */
+.ground-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 260px;
+  height: 26px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(70, 88, 110, 0.22), rgba(70, 88, 110, 0) 78%);
+  pointer-events: none;
+}
+
+/* ---------- 说话气泡 ---------- */
+.bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 52px);
+  width: max-content;
+  max-width: 280px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 10px 28px rgba(58, 74, 94, 0.16);
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, 8px) scale(0.96);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--paper);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.bubble.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* ---------- 点击时飘起来的小心心 ---------- */
+.heart {
+  position: fixed;
+  z-index: 40;
+  font-size: 20px;
+  color: var(--coral);
+  text-shadow: 0 2px 8px rgba(239, 143, 163, 0.35);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: float-up 1.15s ease-out forwards;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--drift, 0px)), -180%) scale(1.15);
+  }
+}
+
+/* ---------- 假任务栏 ---------- */
+.taskbar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  display: flex;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgba(58, 74, 94, 0.12);
+  transform: translateX(-50%);
+  z-index: 5;
+  user-select: none;
+}
+
+.taskbar .icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 17px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* ---------- 透明模式：以后给 Electron 用 ---------- */
+body.is-transparent {
+  background: transparent;
+}
+
+body.is-transparent .wallpaper,
+body.is-transparent .taskbar,
+body.is-transparent .hint,
+body.is-transparent .titlebar {
+  display: none;
+}
+
+/* ---------- 尊重“减少动态效果”的系统设置 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
