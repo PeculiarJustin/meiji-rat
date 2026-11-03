@@ -1,5 +1,7 @@
 # 美叽与大鼠 · 桌面宠物
 
+> A cute scientific desktop companion inspired by Meiji and Rat, designed for researchers and AI-assisted workflows.
+
 一个用来**边做边学前端**的小项目：让「美叽」和「大鼠」住进一个可以拖动、会眨眼、会说话的页面里。
 现在是网页原型（v0.1），下一步会装进 Electron，变成真正待在 Windows 桌面上的宠物。
 
