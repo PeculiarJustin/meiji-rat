@@ -1,6 +1,6 @@
 {
   "name": "meiji-rat-pet",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "美叽与大鼠 · 桌面宠物",
   "author": "PeculiarJustin",
@@ -38,7 +38,8 @@
           ]
         }
       ],
-      "signAndEditExecutable": false
+      "icon": "assets/icon.ico",
+      "signExecutable": false
     },
     "nsis": {
       "oneClick": false,
