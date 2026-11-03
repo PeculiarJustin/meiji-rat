@@ -1,0 +1,14 @@
+{
+  "name": "meiji-rat-pet",
+  "version": "0.2.0",
+  "private": true,
+  "description": "美叽与大鼠 · 桌面宠物",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "web": "python -m http.server 5173"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11"
+  }
+}

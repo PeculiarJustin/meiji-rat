@@ -16,6 +16,10 @@ const pet = document.getElementById("pet");           // 整个宠物（拖动�
 const petInner = document.getElementById("petInner"); // 用来做“跳一下”的动画
 const bubble = document.getElementById("bubble");     // 说话气泡
 
+// 在 Electron 里，preload.js 会注入 window.petAPI；
+// 在普通浏览器里它是 undefined。用它来判断自己跑在哪。
+const isDesktop = Boolean(window.petAPI);
+
 // 随机台词。想加新台词，直接往数组里加一行就行。
 const LINES = [
   "今天也要写点代码呀！",
@@ -27,6 +31,7 @@ const LINES = [
   "你负责敲键盘，我负责可爱。",
   "大鼠说：休息五分钟吧。",
   "头顶这位，是我的充电宝。",
+  "阿一古，有点劳累啊"
 ];
 
 // 记录被点了几次，可以用来解锁彩蛋
@@ -52,10 +57,15 @@ function setPosition(x, y) {
   pet.style.top = `${Math.round(y)}px`;
 }
 
-/** 第一次出现在屏幕中间偏下的位置 */
+/** 第一次出现的位置 */
 function placeAtStart() {
   const x = (window.innerWidth - pet.offsetWidth) / 2;
-  const y = Math.max(40, window.innerHeight * 0.42);
+
+  // 桌面模式下窗口比较矮，让宠物贴着底部站，给头顶的气泡留出空间
+  const y = isDesktop
+    ? window.innerHeight - pet.offsetHeight - 16
+    : Math.max(40, window.innerHeight * 0.42);
+
   setPosition(x, y);
 }
 
@@ -84,6 +94,11 @@ pet.addEventListener("pointerdown", (event) => {
   // 捕获指针：即使鼠标移出宠物，也能继续收到移动事件
   pet.setPointerCapture(event.pointerId);
   pet.classList.add("is-dragging");
+
+  // 桌面模式：告诉主进程“开始拖窗口了”
+  if (isDesktop) {
+    window.petAPI.startDrag(event.screenX, event.screenY);
+  }
 });
 
 pet.addEventListener("pointermove", (event) => {
@@ -95,7 +110,15 @@ pet.addEventListener("pointermove", (event) => {
   // 移动超过 6 像素，就认为用户是在拖动，而不是点击
   if (Math.hypot(dx, dy) > 6) drag.moved = true;
 
-  setPosition(drag.originLeft + dx, drag.originTop + dy);
+  if (isDesktop) {
+    // 桌面模式：宠物在窗口里不动，移动的是整个窗口
+    if (drag.moved) {
+      window.petAPI.dragTo(event.screenX, event.screenY);
+    }
+  } else {
+    // 网页模式：宠物在页面里移动
+    setPosition(drag.originLeft + dx, drag.originTop + dy);
+  }
 });
 
 pet.addEventListener("pointerup", (event) => {
@@ -104,6 +127,10 @@ pet.addEventListener("pointerup", (event) => {
   drag.active = false;
   pet.releasePointerCapture(event.pointerId);
   pet.classList.remove("is-dragging");
+
+  if (isDesktop) {
+    window.petAPI.endDrag();
+  }
 
   // 手指没怎么动 = 点击
   if (!drag.moved) poke();
@@ -121,6 +148,12 @@ pet.addEventListener("keydown", (event) => {
     event.preventDefault();
     poke();
   }
+});
+
+// 右键菜单：桌面模式下由主进程弹出（里面是“退出桌宠”）
+pet.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+  if (isDesktop) window.petAPI.showMenu();
 });
 
 // ---------- 4. 点击后的反应 ----------

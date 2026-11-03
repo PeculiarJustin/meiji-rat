@@ -2,62 +2,107 @@
 
 > A cute scientific desktop companion inspired by Meiji and Rat, designed for researchers and AI-assisted workflows.
 
-一个用来**边做边学前端**的小项目：让「美叽」和「大鼠」住进一个可以拖动、会眨眼、会说话的页面里。
-现在是网页原型（v0.1），下一步会装进 Electron，变成真正待在 Windows 桌面上的宠物。
+一个用来**边做边学前端与桌面开发**的小项目：让「美叽」和「大鼠」住进一个可以拖动、会眨眼、会说话的桌面窗口里。
+
+- **v0.1**：网页原型（HTML / CSS / JS）
+- **v0.2**：装进 Electron，变成透明、置顶、无边框的桌面宠物
 
 > 角色形象目前是 SVG 画的占位版，之后可以替换成你自己的立绘或序列帧。
 
-![预览](preview.png)
+![网页版预览](preview.png)
 
 ## 现在能做什么
 
-- 按住拖动，位置会被限制在窗口内
+- 透明、无边框、始终置顶、不占任务栏的桌面窗口
+- 按住角色拖动，移动的是整个窗口
 - 单击 / 按回车：跳一下、飘心心、随机说一句话
 - 自动眨眼、呼吸、美叽轻轻摇晃
-- 戳满 15 次有小彩蛋
-- `index.html?transparent=1` 打开透明模式（给以后的 Electron 用）
+- 右键 → 退出桌宠
+- 同一份页面在浏览器里也能玩（`index.html`）
 
 ## 怎么运行
 
-**最简单**：双击 `index.html`，用默认浏览器打开。
+### 网页版
 
-**更接近真实开发**（推荐，后面会用到）：在本文件夹打开终端，运行
+双击 `index.html`，或在本文件夹运行：
 
 ```powershell
 python -m http.server 5173
 ```
 
-然后浏览器访问 <http://localhost:5173>。
+然后访问 <http://localhost:5173>。
+
+### 桌面版
+
+```powershell
+npm install
+npm start
+```
+
+> **本机备注**：这台机器上 Electron 对安装路径比较敏感，直接 `npm start` 会启动失败，请双击 `启动桌宠.cmd`。它会把 `D:\electron-runtime` 里的 Electron 运行时拉起来；换一台电脑则直接用 `npm start`。
 
 ## 文件地图
 
-| 文件 | 作用 | 类比 |
-| --- | --- | --- |
-| `index.html` | 页面结构：有哪些元素、谁套在谁里面 | 房子的骨架 |
-| `style.css` | 外观和动画：颜色、大小、位置、呼吸和眨眼 | 装修和动作指导 |
-| `pet.js` | 行为：拖动、点击、说话、随机数 | 大脑和神经 |
-| `preview.png` | 页面截图 | 照片 |
-| `assets/` | 以后放角色图片、音效 | 道具间 |
+| 文件 | 作用 |
+| --- | --- |
+| `index.html` | 页面结构：角色、气泡、背景 |
+| `style.css` | 外观和动画：颜色、位置、呼吸、眨眼 |
+| `pet.js` | 网页行为：拖动、点击、说话、眨眼 |
+| `electron/main.js` | **主进程**：创建窗口、移动窗口、右键菜单、退出 |
+| `electron/preload.js` | **安全桥**：只把 `startDrag / dragTo / endDrag / showMenu` 暴露给网页 |
+| `launch.ps1` | 本机启动脚本：用 `Start-Process` 传递带空格的路径 |
+| `启动桌宠.cmd` | 双击入口，调用 `launch.ps1` |
+| `package.json` | 项目清单、依赖和 `npm start` 命令 |
+| `assets/` | 以后放角色图片、音效 |
+
+## Electron 是怎么工作的
+
+一个 Electron 应用里有两种进程：
+
+```
+┌──────────────── Electron 应用 ────────────────┐
+│                                               │
+│  主进程 main.js（Node.js 环境）                │
+│  ├─ 创建窗口 BrowserWindow                    │
+│  ├─ 设置透明 / 置顶 / 无边框                   │
+│  ├─ 收到 IPC：移动窗口、弹右键菜单              │
+│  └─ 退出应用                                   │
+│              ▲                                │
+│              │ IPC（进程间通信，像对讲机）       │
+│              ▼                                │
+│  渲染进程（Chromium 环境）                     │
+│  └─ index.html + style.css + pet.js           │
+│     通过 preload.js 暴露的 window.petAPI 发消息 │
+└───────────────────────────────────────────────┘
+```
+
+- **主进程**负责“操作系统层面”的事：开窗口、设属性、移动窗口、退出。
+- **渲染进程**负责“界面层面”的事：画角色、跑动画、处理点击。
+- **preload.js** 是两者之间的一道窄门：网页不能直接碰 Node / Electron，只能调用这里明确开放的几个函数。
+- 拖动就是一次完整的 IPC 往返：`pointerdown → startDrag → 主进程记下窗口位置`，`pointermove → dragTo → 主进程 setPosition`。
+
+这样设计是为了安全：网页代码（尤其是以后加载的网络内容）不能直接读写你的文件系统。
 
 ## 学习路线
 
-- [x] **阶段 0 · 网页原型**：HTML / CSS / JS 三件套，做出能玩的第一版
-- [ ] **阶段 1 · Git 与 GitHub**：版本管理、提交、远程仓库、README
-- [ ] **阶段 2 · Electron**：把网页装进透明、置顶、无边框的桌面窗口
+- [x] **阶段 0 · 网页原型**：HTML / CSS / JS 三件套
+- [x] **阶段 1 · Git 与 GitHub**：提交、远程仓库、合并、README
+- [x] **阶段 2 · Electron**：透明、置顶、无边框窗口 + IPC
 - [ ] **阶段 3 · 打包发布**：生成 `.exe`、托盘图标、开机自启
 - [ ] **阶段 4 · 更像宠物**：真实素材、状态机（走路 / 睡觉 / 饿）、存档
 
 ## 这一版用到的概念
 
-- **DOM**：JS 用 `document.getElementById` 找到页面元素，再改它的样式和文字
-- **绝对定位**：`position: fixed` + `left/top` 让宠物可以停在窗口任意位置
+- **DOM**：JS 用 `document.getElementById` 找到页面元素
+- **绝对定位**：`position: fixed` + `left/top`
 - **transform 动画**：`scale`（呼吸）、`translateY`（跳）、`scaleY`（眨眼）
-- **指针事件**：`pointerdown / pointermove / pointerup` 一套组合实现拖动
-- **事件与状态**：用 `drag.moved` 区分「拖动」和「点击」
-- **定时器**：`setTimeout` 安排眨眼和气泡自动消失
+- **指针事件**：`pointerdown / pointermove / pointerup`
+- **窗口属性**：`transparent`、`frame: false`、`alwaysOnTop`、`skipTaskbar`
+- **preload + contextBridge**：安全地把少量能力暴露给网页
+- **IPC**：`ipcRenderer.send` / `ipcMain.on` 传消息
 
-## 小练习（想动手时试试）
+## 小练习
 
 1. 在 `pet.js` 的 `LINES` 里加一句你自己的台词。
-2. 把 `style.css` 里 `.rat` 的 `width` 改成 `420px`，看看页面哪里需要跟着调。
-3. 给 `poke()` 加一个「连续点击 5 次后跳得更高」的分支。
+2. 把 `style.css` 里 `.rat` 的 `width` 改成 `420px`，看看窗口尺寸要不要跟着调。
+3. 在 `main.js` 里把 `alwaysOnTop` 改成 `false`，体验一下“不置顶”的区别。

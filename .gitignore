@@ -220,6 +220,9 @@ __marimo__/
 # ===== 本项目（Node / Electron / Windows）=====
 node_modules/
 out/
+.npm-cache/
+.electron-cache/
+.electron-data/
 .tmp-edge*/
 *.log
 Thumbs.db
