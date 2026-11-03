@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.peculiarjustin.meiji-rat",
-    "productName": "美叽与大鼠",
+    "productName": "MeijiRatPet",
     "asar": true,
     "files": [
       "index.html",
@@ -48,6 +48,6 @@
       "createStartMenuShortcut": true,
       "shortcutName": "美叽与大鼠"
     },
-    "artifactName": "美叽与大鼠-Setup-${version}.${ext}"
+    "artifactName": "MeijiRatPet-Setup-${version}.${ext}"
   }
 }
